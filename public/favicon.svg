@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect x="0" y="0" width="50" height="100" fill="#2563eb"/>
+  <rect x="50" y="0" width="50" height="100" fill="#dc2626"/>
+  <text x="25" y="68" font-size="52" font-weight="900" fill="white" text-anchor="middle" font-family="Arial">친</text>
+  <text x="75" y="68" font-size="52" font-weight="900" fill="white" text-anchor="middle" font-family="Arial">사</text>
+</svg>
