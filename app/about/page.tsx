@@ -8,7 +8,7 @@ export default function AboutPage() {
       <div className="space-y-10" style={{color: '#374151'}}>
 
         <section className="p-6 rounded-xl" style={{backgroundColor: '#eff6ff', borderLeft: '4px solid #2563eb'}}>
-          <h2 className="text-2xl font-semibold mb-4" style={{color: '#1e3a8a'}}>안녕하세요 🙋</h2>
+          <h2 className="text-2xl font-semibold mb-4" style={{color: '#1e3a8a'}}>안녕하세요 🙋‍♂️🙋‍♀️</h2>
           <p className="leading-relaxed">
             저는 친사입니다. 아제르바이잔 바쿠에서 작은 사업을 하며 살고 있습니다.
           </p>
