@@ -1,4 +1,9 @@
+import { getAllPosts } from '@/lib/posts';
+
 export default function Home() {
+  const allPosts = getAllPosts();
+  const recentPosts = allPosts.slice(0, 3);
+
   const topics = [
     {
       title: '여행',
@@ -68,24 +73,22 @@ export default function Home() {
         <h2 className="text-2xl font-bold mb-2" style={{color: '#1e3a8a'}}>최근 글</h2>
         <div className="w-12 h-1 mb-6" style={{backgroundColor: '#2563eb'}}></div>
         <ul className="space-y-6">
-          <li className="p-6 rounded-xl shadow-sm" style={{border: '1px solid #e5e7eb'}}>
-            <p className="text-sm mb-1" style={{color: '#9ca3af'}}>2026년 5월 8일</p>
-            <h3 className="text-xl font-semibold mb-2">
-              <a href="/blog/first-post" style={{color: '#2563eb'}}>
-                첫 번째 블로그 글
-              </a>
-            </h3>
-            <p style={{color: '#4b5563'}}>블로그를 시작하며 첫 번째 글을 작성합니다.</p>
-          </li>
-          <li className="p-6 rounded-xl shadow-sm" style={{border: '1px solid #e5e7eb'}}>
-            <p className="text-sm mb-1" style={{color: '#9ca3af'}}>2026년 5월 7일</p>
-            <h3 className="text-xl font-semibold mb-2">
-              <a href="/blog/wsl2-setup" style={{color: '#2563eb'}}>
-                WSL2 개발환경 구축기
-              </a>
-            </h3>
-            <p style={{color: '#4b5563'}}>윈도우에서 리눅스 개발환경을 만들어 보았습니다.</p>
-          </li>
+          {recentPosts.map((post) => (
+            <li key={post.slug} className="p-6 rounded-xl shadow-sm" style={{border: '1px solid #e5e7eb'}}>
+              <p className="text-sm mb-1" style={{color: '#9ca3af'}}>{post.date}</p>
+              <h3 className="text-xl font-semibold mb-2">
+                <a href={`/blog/${post.slug}`} style={{color: '#2563eb'}}>
+                  {post.title}
+                </a>
+              </h3>
+              <p style={{color: '#4b5563'}}>{post.description}</p>
+              <div className="mt-3">
+                <a href={`/blog/${post.slug}`} className="text-sm font-semibold" style={{color: '#2563eb'}}>
+                  더 읽기 →
+                </a>
+              </div>
+            </li>
+          ))}
         </ul>
       </section>
     </main>
