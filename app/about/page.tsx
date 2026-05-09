@@ -22,10 +22,9 @@ export default function AboutPage() {
           <ul className="space-y-3">
             {[
               { emoji: '✈️', text: '여행' },
-              { emoji: '🍳', text: '요리' },
               { emoji: '🌏', text: '한국과 아제르바이잔 — 언어와 문화' },
               { emoji: '💻', text: '컴퓨터 / 우분투' },
-              { emoji: '✝️', text: '종교' },
+              { emoji: '✝️', text: '신과 자연' },
             ].map((item) => (
               <li key={item.text} className="flex items-center gap-3 p-3 rounded-lg" style={{backgroundColor: '#f9fafb'}}>
                 <span className="text-2xl">{item.emoji}</span>
