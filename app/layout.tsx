@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const notoSansKR = Noto_Sans_KR({
+  variable: "--font-noto-sans-kr",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["300", "400", "500", "700"],
 });
 
 export const metadata: Metadata = {
@@ -28,12 +24,12 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${geistSans.variable} ${geistMono.variable} h-full`}
+      className={`${notoSansKR.variable} h-full`}
     >
-      <body className="min-h-full flex flex-col bg-white text-gray-900">
+      <body className="min-h-full flex flex-col bg-white text-gray-900" style={{fontFamily: 'var(--font-noto-sans-kr), sans-serif'}}>
         <header className="border-b border-gray-200 shadow-sm">
           <nav className="max-w-2xl mx-auto px-4 py-4 flex justify-between items-center">
-            <a href="/" className="text-xl font-bold text-blue-600">
+            <a href="/" className="text-xl font-bold" style={{color: '#2563eb'}}>
               친사's Blog
             </a>
             <div className="flex gap-6">
@@ -47,7 +43,7 @@ export default function RootLayout({
           {children}
         </main>
         <footer className="border-t border-gray-200">
-          <div className="max-w-2xl mx-auto px-4 py-6 text-center text-gray-400 text-sm">
+          <div className="max-w-2xl mx-auto px-4 py-6 text-center text-sm" style={{color: '#9ca3af'}}>
             © 2026 친사's Blog. All rights reserved.
           </div>
         </footer>
