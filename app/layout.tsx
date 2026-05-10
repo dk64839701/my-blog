@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
+import MusicPlayer from "./components/MusicPlayer";
 
 const notoSansKR = Noto_Sans_KR({
   variable: "--font-noto-sans-kr",
@@ -32,7 +33,8 @@ export default function RootLayout({
             <a href="/" className="text-xl font-bold" style={{color: '#2563eb'}}>
               친사's Blog
             </a>
-            <div className="flex gap-6">
+            <div className="flex items-center gap-6">
+              <MusicPlayer />
               <a href="/" className="hover:text-blue-600 transition-colors">홈</a>
               <a href="/blog" className="hover:text-blue-600 transition-colors">블로그</a>
               <a href="/about" className="hover:text-blue-600 transition-colors">소개</a>
