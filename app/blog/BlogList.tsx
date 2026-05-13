@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Post } from "@/lib/supabase";
 
 const categories = ['전체', '일상', '여행', '한국 & 아제르바이잔', '컴퓨터', '신과 자연'];
 
@@ -10,14 +11,6 @@ const emojiMap: { [key: string]: string } = {
   '한국 & 아제르바이잔': '🌏',
   '컴퓨터': '💻',
   '신과 자연': '🌿',
-};
-
-type Post = {
-  slug: string;
-  title: string;
-  date: string;
-  category: string;
-  description: string;
 };
 
 export default function BlogList({ posts }: { posts: Post[] }) {

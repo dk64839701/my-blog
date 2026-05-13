@@ -1,7 +1,7 @@
 import { getAllPosts } from '@/lib/posts';
 
-export default function Home() {
-  const allPosts = getAllPosts();
+export default async function Home() {
+  const allPosts = await getAllPosts();
   const recentPosts = allPosts.slice(0, 3);
 
   const topics = [

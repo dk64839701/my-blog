@@ -1,41 +1,46 @@
-import fs from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
+import { supabase, supabaseAdmin, Post } from './supabase';
 
-const postsDirectory = path.join(process.cwd(), 'posts');
+export async function getAllPosts(): Promise<Post[]> {
+  const { data, error } = await supabase
+    .from('posts')
+    .select('*')
+    .order('date', { ascending: false });
 
-export function getAllPosts() {
-  const fileNames = fs.readdirSync(postsDirectory);
-  const posts = fileNames
-    .filter((fileName) => fileName.endsWith('.md'))
-    .map((fileName) => {
-      const slug = fileName.replace(/\.md$/, '');
-      const fullPath = path.join(postsDirectory, fileName);
-      const fileContents = fs.readFileSync(fullPath, 'utf8');
-      const { data, content } = matter(fileContents);
-      return {
-        slug,
-        title: data.title,
-        date: data.date,
-        category: data.category,
-        description: data.description,
-        content,
-      };
-    });
+  if (error) {
+    console.error('글 목록 가져오기 실패:', error);
+    return [];
+  }
 
-  return posts.sort((a, b) => (a.date < b.date ? 1 : -1));
+  return data || [];
 }
 
-export function getPostBySlug(slug: string) {
-  const fullPath = path.join(postsDirectory, `${slug}.md`);
-  const fileContents = fs.readFileSync(fullPath, 'utf8');
-  const { data, content } = matter(fileContents);
-  return {
-    slug,
-    title: data.title,
-    date: data.date,
-    category: data.category,
-    description: data.description,
-    content,
-  };
+export async function getPostBySlug(slug: string): Promise<Post | null> {
+  const { data, error } = await supabase
+    .from('posts')
+    .select('*')
+    .eq('slug', slug)
+    .single();
+
+  if (error) {
+    console.error('글 가져오기 실패:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function savePost(post: Omit<Post, 'id' | 'created_at'>, password: string): Promise<{ success: boolean; error?: string }> {
+  if (password !== process.env.ADMIN_PASSWORD) {
+    return { success: false, error: '비밀번호가 틀렸습니다' };
+  }
+
+  const { error } = await supabaseAdmin
+    .from('posts')
+    .upsert(post, { onConflict: 'slug' });
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  return { success: true };
 }
