@@ -1,26 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifySession, SESSION_COOKIE } from '@/lib/auth';
 
-export async function proxy(request: NextRequest) {
-  const path = request.nextUrl.pathname;
+export function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
 
-  if (path === '/admin/login') return NextResponse.next();
-
-  const sessionValue = request.cookies.get(SESSION_COOKIE)?.value;
-  if (!sessionValue) {
-    return NextResponse.redirect(new URL('/admin/login', request.url));
+  if (pathname.startsWith('/admin/login')) {
+    return NextResponse.next();
   }
 
-  const email = await verifySession(sessionValue);
-  if (!email) {
-    const response = NextResponse.redirect(new URL('/admin/login', request.url));
-    response.cookies.delete(SESSION_COOKIE);
-    return response;
+  if (!request.cookies.has('admin_session')) {
+    return NextResponse.redirect(new URL('/admin/login', request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: ['/admin', '/admin/:path+'],
 };
