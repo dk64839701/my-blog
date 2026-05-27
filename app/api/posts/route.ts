@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { supabaseAdmin } from '@/lib/supabase';
 import { verifySession, SESSION_COOKIE } from '@/lib/auth';
+import { revalidatePath } from 'next/cache';
 
 async function requireAdmin(): Promise<string | null> {
   const cookieStore = await cookies();
@@ -51,6 +52,11 @@ export async function POST(request: NextRequest) {
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
+    // 글 저장 후 관련 페이지 캐시 무효화
+    revalidatePath('/');
+    revalidatePath('/blog');
+    revalidatePath(`/blog/${slug}`);
 
     return NextResponse.json({ success: true, slug });
   } catch (error) {

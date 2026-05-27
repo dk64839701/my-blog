@@ -1,5 +1,7 @@
 import { getAllPosts } from '@/lib/posts';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   const allPosts = await getAllPosts();
   const recentPosts = allPosts.slice(0, 3);
