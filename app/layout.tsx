@@ -59,6 +59,10 @@ export default function RootLayout({
         <footer className="border-t border-gray-200">
           <div className="max-w-2xl mx-auto px-4 py-6 text-center text-sm" style={{color: '#9ca3af'}}>
             © 2026 친사's Blog. All rights reserved.
+            <span className="mx-2">·</span>
+            <Link href="/admin" style={{color: '#d1d5db'}} className="hover:text-gray-400 transition-colors">
+              관리자
+            </Link>
           </div>
         </footer>
 
