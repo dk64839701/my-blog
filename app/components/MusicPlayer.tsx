@@ -1,80 +1,87 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
 const TRACKS = [
   "https://res.cloudinary.com/dkkng85jk/video/upload/v1778415637/Beneath_the_Bamboo_Canopy_whmxtb.mp3",
   "https://res.cloudinary.com/dkkng85jk/video/upload/v1778415637/Where_the_Water_Rests_yoqqlf.mp3",
 ];
 
-const STORAGE_KEY = "bg-music-stopped";
+// 모듈 레벨: 같은 탭 내 페이지 이동 시 유지, 탭 닫으면 초기화
+let sharedAudio: HTMLAudioElement | null = null;
+let sharedTrackIndex = 0;
+let sharedUserStopped = false;
+
+function createAudio(onEnded: () => void): HTMLAudioElement {
+  const audio = new Audio(TRACKS[sharedTrackIndex]);
+  audio.addEventListener("ended", onEnded);
+  return audio;
+}
 
 export default function MusicPlayer() {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const trackIndexRef = useRef(0);
-  const userStoppedRef = useRef(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
-    // 사용자가 이전에 명시적으로 정지했으면 자동재생하지 않음
-    userStoppedRef.current = localStorage.getItem(STORAGE_KEY) === "true";
-    if (userStoppedRef.current) return;
+    if (sharedUserStopped) {
+      setIsPlaying(false);
+      return;
+    }
 
-    const audio = new Audio(TRACKS[0]);
-    audioRef.current = audio;
+    const onEnded = () => {
+      sharedTrackIndex = (sharedTrackIndex + 1) % TRACKS.length;
+      if (sharedAudio) {
+        sharedAudio.src = TRACKS[sharedTrackIndex];
+        sharedAudio.play().catch(() => {});
+      }
+    };
 
-    audio.addEventListener("ended", () => {
-      trackIndexRef.current = (trackIndexRef.current + 1) % TRACKS.length;
-      audio.src = TRACKS[trackIndexRef.current];
-      audio.play().catch(() => {});
-    });
+    if (!sharedAudio) {
+      sharedAudio = createAudio(onEnded);
 
-    // 자동재생 시도
-    audio
-      .play()
-      .then(() => setIsPlaying(true))
-      .catch(() => {
-        // 브라우저 정책으로 자동재생 차단됨 — 첫 사용자 상호작용 시 재생
-        const startOnFirstInteraction = () => {
-          if (!userStoppedRef.current && audio.paused) {
-            audio
-              .play()
-              .then(() => setIsPlaying(true))
-              .catch(() => {});
-          }
-          document.removeEventListener("click", startOnFirstInteraction, true);
-          document.removeEventListener("keydown", startOnFirstInteraction, true);
-        };
-        document.addEventListener("click", startOnFirstInteraction, true);
-        document.addEventListener("keydown", startOnFirstInteraction, true);
-      });
+      sharedAudio
+        .play()
+        .then(() => setIsPlaying(true))
+        .catch(() => {
+          // 브라우저 자동재생 차단 시 첫 번째 사용자 상호작용에서 재생
+          const startOnFirstInteraction = () => {
+            if (!sharedUserStopped && sharedAudio?.paused) {
+              sharedAudio.play()
+                .then(() => setIsPlaying(true))
+                .catch(() => {});
+            }
+            document.removeEventListener("click", startOnFirstInteraction, true);
+            document.removeEventListener("keydown", startOnFirstInteraction, true);
+          };
+          document.addEventListener("click", startOnFirstInteraction, true);
+          document.addEventListener("keydown", startOnFirstInteraction, true);
+        });
+    } else {
+      // 레이아웃이 유지되므로 실제로 여기 도달하지 않지만 방어 코드
+      setIsPlaying(!sharedAudio.paused);
+    }
   }, []);
 
   const toggle = () => {
-    // 오디오가 아직 생성되지 않은 경우 (userStopped 상태로 시작한 경우)
-    if (!audioRef.current) {
-      const audio = new Audio(TRACKS[trackIndexRef.current]);
-      audioRef.current = audio;
-      audio.addEventListener("ended", () => {
-        trackIndexRef.current = (trackIndexRef.current + 1) % TRACKS.length;
-        audio.src = TRACKS[trackIndexRef.current];
-        audio.play().catch(() => {});
-      });
+    const onEnded = () => {
+      sharedTrackIndex = (sharedTrackIndex + 1) % TRACKS.length;
+      if (sharedAudio) {
+        sharedAudio.src = TRACKS[sharedTrackIndex];
+        sharedAudio.play().catch(() => {});
+      }
+    };
+
+    if (!sharedAudio) {
+      sharedAudio = createAudio(onEnded);
     }
 
-    const audio = audioRef.current!;
-
     if (isPlaying) {
-      audio.pause();
-      userStoppedRef.current = true;
-      localStorage.setItem(STORAGE_KEY, "true");
+      sharedAudio.pause();
+      sharedUserStopped = true;
       setIsPlaying(false);
     } else {
-      audio
-        .play()
+      sharedAudio.play()
         .then(() => {
-          userStoppedRef.current = false;
-          localStorage.setItem(STORAGE_KEY, "false");
+          sharedUserStopped = false;
           setIsPlaying(true);
         })
         .catch(() => {});
