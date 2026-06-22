@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Noto_Sans_KR } from "next/font/google";
 import Link from "next/link";
 import MusicPlayer from "@/app/components/MusicPlayer";
+import PWAInstaller from "@/app/components/PWAInstaller";
 import "./globals.css";
 
 const notoSansKR = Noto_Sans_KR({
@@ -15,7 +16,19 @@ export const metadata: Metadata = {
   description: "친사의 개인 블로그",
   icons: {
     icon: "/favicon.svg",
+    apple: "/icons/apple-touch-icon.png",
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "친사 블로그",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#2563eb",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -39,6 +52,7 @@ export default function RootLayout({
             </div>
           </nav>
         </header>
+        <PWAInstaller />
         <main className="flex-1">
           {children}
         </main>
