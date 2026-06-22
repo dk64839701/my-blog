@@ -26,8 +26,6 @@ function createAudio(): HTMLAudioElement {
 
 export default function MusicPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
-  // 자동재생이 차단되어 첫 터치/클릭을 기다리는 상태
-  const [waitingForTouch, setWaitingForTouch] = useState(false);
 
   useEffect(() => {
     if (sharedUserStopped) return;
@@ -37,39 +35,29 @@ export default function MusicPlayer() {
     }
     const audio = sharedAudio;
 
+    // 자동재생 시도
     audio
       .play()
-      .then(() => {
-        setIsPlaying(true);
-      })
+      .then(() => setIsPlaying(true))
       .catch(() => {
-        // 모바일 포함 자동재생 차단 시: 첫 터치 또는 클릭에서 재생
-        setWaitingForTouch(true);
-
-        let started = false;
-        const startMusic = () => {
-          if (started || sharedUserStopped) return;
-          started = true;
+        // 자동재생 차단됨 — 페이지의 첫 번째 click 이벤트에서 재생 시도
+        // (버블 방식: 버튼 클릭 시에는 toggle()이 먼저 처리하고 이 리스너는 정리만 함)
+        const startOnFirstClick = () => {
+          if (sharedUserStopped || !audio.paused) {
+            document.removeEventListener("click", startOnFirstClick);
+            return;
+          }
           audio
             .play()
             .then(() => {
               setIsPlaying(true);
-              setWaitingForTouch(false);
+              document.removeEventListener("click", startOnFirstClick);
             })
-            .catch(() => {});
+            .catch(() => {
+              // 이 click에서도 실패하면 다음 click에서 재시도
+            });
         };
-
-        // touchstart: 모바일에서 가장 먼저 발생하는 이벤트
-        // click: 데스크탑 및 모바일 탭 동작
-        document.addEventListener("touchstart", startMusic, {
-          once: true,
-          passive: true,
-          capture: true,
-        });
-        document.addEventListener("click", startMusic, {
-          once: true,
-          capture: true,
-        });
+        document.addEventListener("click", startOnFirstClick);
       });
   }, []);
 
@@ -83,14 +71,12 @@ export default function MusicPlayer() {
       audio.pause();
       sharedUserStopped = true;
       setIsPlaying(false);
-      setWaitingForTouch(false);
     } else {
       audio
         .play()
         .then(() => {
           sharedUserStopped = false;
           setIsPlaying(true);
-          setWaitingForTouch(false);
         })
         .catch(() => {});
     }
@@ -98,17 +84,12 @@ export default function MusicPlayer() {
 
   return (
     <div className="flex items-center gap-2">
-      <span
-        className={waitingForTouch ? "animate-pulse" : ""}
-        style={{ fontSize: "13px" }}
-        title={waitingForTouch ? "화면을 터치하면 음악이 시작됩니다" : ""}
-      >
+      <span style={{ fontSize: "13px", color: isPlaying ? "#6b7280" : "#d1d5db" }}>
         🎵
       </span>
       <button
         onClick={toggle}
         title={isPlaying ? "음악 정지" : "음악 재생"}
-        className={waitingForTouch ? "animate-pulse" : ""}
         style={{
           backgroundColor: "#2563eb",
           color: "white",
