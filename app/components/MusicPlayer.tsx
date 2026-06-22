@@ -12,77 +12,85 @@ let sharedAudio: HTMLAudioElement | null = null;
 let sharedTrackIndex = 0;
 let sharedUserStopped = false;
 
-function createAudio(onEnded: () => void): HTMLAudioElement {
+function createAudio(): HTMLAudioElement {
   const audio = new Audio(TRACKS[sharedTrackIndex]);
-  audio.addEventListener("ended", onEnded);
+  audio.addEventListener("ended", () => {
+    sharedTrackIndex = (sharedTrackIndex + 1) % TRACKS.length;
+    if (sharedAudio) {
+      sharedAudio.src = TRACKS[sharedTrackIndex];
+      sharedAudio.play().catch(() => {});
+    }
+  });
   return audio;
 }
 
 export default function MusicPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
+  // 자동재생이 차단되어 첫 터치/클릭을 기다리는 상태
+  const [waitingForTouch, setWaitingForTouch] = useState(false);
 
   useEffect(() => {
-    if (sharedUserStopped) {
-      setIsPlaying(false);
-      return;
-    }
-
-    const onEnded = () => {
-      sharedTrackIndex = (sharedTrackIndex + 1) % TRACKS.length;
-      if (sharedAudio) {
-        sharedAudio.src = TRACKS[sharedTrackIndex];
-        sharedAudio.play().catch(() => {});
-      }
-    };
+    if (sharedUserStopped) return;
 
     if (!sharedAudio) {
-      sharedAudio = createAudio(onEnded);
-
-      sharedAudio
-        .play()
-        .then(() => setIsPlaying(true))
-        .catch(() => {
-          // 브라우저 자동재생 차단 시 첫 번째 사용자 상호작용에서 재생
-          const startOnFirstInteraction = () => {
-            if (!sharedUserStopped && sharedAudio?.paused) {
-              sharedAudio.play()
-                .then(() => setIsPlaying(true))
-                .catch(() => {});
-            }
-            document.removeEventListener("click", startOnFirstInteraction, true);
-            document.removeEventListener("keydown", startOnFirstInteraction, true);
-          };
-          document.addEventListener("click", startOnFirstInteraction, true);
-          document.addEventListener("keydown", startOnFirstInteraction, true);
-        });
-    } else {
-      // 레이아웃이 유지되므로 실제로 여기 도달하지 않지만 방어 코드
-      setIsPlaying(!sharedAudio.paused);
+      sharedAudio = createAudio();
     }
+    const audio = sharedAudio;
+
+    audio
+      .play()
+      .then(() => {
+        setIsPlaying(true);
+      })
+      .catch(() => {
+        // 모바일 포함 자동재생 차단 시: 첫 터치 또는 클릭에서 재생
+        setWaitingForTouch(true);
+
+        let started = false;
+        const startMusic = () => {
+          if (started || sharedUserStopped) return;
+          started = true;
+          audio
+            .play()
+            .then(() => {
+              setIsPlaying(true);
+              setWaitingForTouch(false);
+            })
+            .catch(() => {});
+        };
+
+        // touchstart: 모바일에서 가장 먼저 발생하는 이벤트
+        // click: 데스크탑 및 모바일 탭 동작
+        document.addEventListener("touchstart", startMusic, {
+          once: true,
+          passive: true,
+          capture: true,
+        });
+        document.addEventListener("click", startMusic, {
+          once: true,
+          capture: true,
+        });
+      });
   }, []);
 
   const toggle = () => {
-    const onEnded = () => {
-      sharedTrackIndex = (sharedTrackIndex + 1) % TRACKS.length;
-      if (sharedAudio) {
-        sharedAudio.src = TRACKS[sharedTrackIndex];
-        sharedAudio.play().catch(() => {});
-      }
-    };
-
     if (!sharedAudio) {
-      sharedAudio = createAudio(onEnded);
+      sharedAudio = createAudio();
     }
+    const audio = sharedAudio;
 
     if (isPlaying) {
-      sharedAudio.pause();
+      audio.pause();
       sharedUserStopped = true;
       setIsPlaying(false);
+      setWaitingForTouch(false);
     } else {
-      sharedAudio.play()
+      audio
+        .play()
         .then(() => {
           sharedUserStopped = false;
           setIsPlaying(true);
+          setWaitingForTouch(false);
         })
         .catch(() => {});
     }
@@ -90,10 +98,17 @@ export default function MusicPlayer() {
 
   return (
     <div className="flex items-center gap-2">
-      <span style={{ fontSize: "11px", color: "#6b7280" }}>🎵</span>
+      <span
+        className={waitingForTouch ? "animate-pulse" : ""}
+        style={{ fontSize: "13px" }}
+        title={waitingForTouch ? "화면을 터치하면 음악이 시작됩니다" : ""}
+      >
+        🎵
+      </span>
       <button
         onClick={toggle}
         title={isPlaying ? "음악 정지" : "음악 재생"}
+        className={waitingForTouch ? "animate-pulse" : ""}
         style={{
           backgroundColor: "#2563eb",
           color: "white",
