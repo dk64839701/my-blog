@@ -3,7 +3,12 @@ import BlogList from './BlogList';
 
 export const dynamic = 'force-dynamic';
 
-export default async function BlogPage() {
+export default async function BlogPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string }>;
+}) {
   const posts = await getAllPosts();
-  return <BlogList posts={posts} />;
+  const { category } = await searchParams;
+  return <BlogList posts={posts} initialCategory={category} />;
 }

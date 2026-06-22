@@ -13,8 +13,10 @@ const emojiMap: { [key: string]: string } = {
   '신과 자연': '🌿',
 };
 
-export default function BlogList({ posts }: { posts: Post[] }) {
-  const [selected, setSelected] = useState('전체');
+export default function BlogList({ posts, initialCategory }: { posts: Post[]; initialCategory?: string }) {
+  const [selected, setSelected] = useState(
+    initialCategory && categories.includes(initialCategory) ? initialCategory : '전체'
+  );
 
   const filtered = selected === '전체'
     ? posts
