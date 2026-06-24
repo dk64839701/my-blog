@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import EditorToolbar from "@/app/admin/EditorToolbar";
 
 export default function WritePage() {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [category, setCategory] = useState("일상");
@@ -213,7 +215,9 @@ export default function WritePage() {
         <label className="block text-sm font-semibold mb-1">
           본문 (마크다운)
         </label>
+        <EditorToolbar textareaRef={textareaRef} content={content} setContent={setContent} />
         <textarea
+          ref={textareaRef}
           value={content}
           onChange={(e) => setContent(e.target.value)}
           rows={15}

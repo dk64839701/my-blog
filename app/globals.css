@@ -28,6 +28,39 @@ a {
   text-decoration: none;
 }
 
+.post-content p {
+  margin: 0 0 1em 0;
+}
+
+.post-content ul,
+.post-content ol {
+  margin: 0 0 1em 1.5em;
+}
+
+.post-content ul {
+  list-style: disc;
+}
+
+.post-content ol {
+  list-style: decimal;
+}
+
+.post-content li {
+  margin: 0.25em 0;
+}
+
+.post-content strong {
+  font-weight: 700;
+}
+
+.post-content em {
+  font-style: italic;
+}
+
+.post-content u {
+  text-decoration: underline;
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: light;

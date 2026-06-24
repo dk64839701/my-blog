@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getPostBySlug, getAllPosts } from '@/lib/posts';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import { notFound } from 'next/navigation';
+import remarkBreaks from 'remark-breaks';
 
 export async function generateStaticParams() {
   const posts = await getAllPosts();
@@ -32,8 +33,11 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
       <div className="w-16 h-1 mb-6" style={{backgroundColor: '#2563eb'}}></div>
 
-      <div className="space-y-2 leading-snug" style={{color: '#374151', fontSize: '16px'}}>
-        <MDXRemote source={post.content} />
+      <div className="post-content leading-snug" style={{color: '#374151', fontSize: '16px'}}>
+        <MDXRemote
+          source={post.content}
+          options={{ mdxOptions: { remarkPlugins: [remarkBreaks] } }}
+        />
       </div>
 
       <div className="mt-8 pt-4" style={{borderTop: '1px solid #e5e7eb'}}>

@@ -1,14 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { Suspense } from "react";
+import EditorToolbar from "@/app/admin/EditorToolbar";
 
 function EditForm() {
   const searchParams = useSearchParams();
   const slugParam = searchParams.get("slug") || "";
   const router = useRouter();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const [slug] = useState(slugParam);
   const [loaded, setLoaded] = useState(false);
@@ -231,7 +233,9 @@ function EditForm() {
             <label className="block text-sm font-semibold mb-1">
               본문 (마크다운)
             </label>
+            <EditorToolbar textareaRef={textareaRef} content={content} setContent={setContent} />
             <textarea
+              ref={textareaRef}
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={15}
