@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { getPostBySlug, getAllPosts } from '@/lib/posts';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import { notFound } from 'next/navigation';
@@ -17,7 +18,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     <main className="max-w-2xl mx-auto px-4 py-8">
 
       <div className="mb-3">
-        <a href="/blog" style={{color: '#2563eb', fontSize: '14px'}}>← 블로그 목록으로</a>
+        <Link href="/blog" style={{color: '#2563eb', fontSize: '14px'}}>← 블로그 목록으로</Link>
       </div>
 
       <div className="mb-3">
@@ -36,7 +37,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
       </div>
 
       <div className="mt-8 pt-4" style={{borderTop: '1px solid #e5e7eb'}}>
-        <a href="/blog" style={{color: '#2563eb', fontSize: '14px', fontWeight: '600'}}>← 블로그 목록으로</a>
+        <Link href="/blog" style={{color: '#2563eb', fontSize: '14px', fontWeight: '600'}}>← 블로그 목록으로</Link>
       </div>
 
     </main>

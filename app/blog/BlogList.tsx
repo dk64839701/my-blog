@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Post } from "@/lib/supabase";
 
 const categories = ['전체', '일상', '여행', '한국 & 아제르바이잔', '컴퓨터', '신과 자연'];
@@ -53,18 +54,18 @@ export default function BlogList({ posts, initialCategory }: { posts: Post[]; in
             <li key={post.slug} className="p-6 rounded-xl shadow-sm" style={{border: '1px solid #e5e7eb'}}>
               <p className="text-sm mb-2" style={{color: '#9ca3af'}}>{post.date}</p>
               <h2 className="text-xl font-semibold mb-2">
-                <a href={`/blog/${post.slug}`} style={{color: '#2563eb'}}>
+                <Link href={`/blog/${post.slug}`} style={{color: '#2563eb'}}>
                   {emojiMap[post.category] || '📝'} {post.title}
-                </a>
+                </Link>
               </h2>
               <p className="mb-4" style={{color: '#4b5563', fontSize: '15px'}}>{post.description}</p>
               <div className="flex items-center justify-between">
                 <span className="text-xs px-3 py-1 rounded-full" style={{backgroundColor: '#eff6ff', color: '#2563eb'}}>
                   {post.category}
                 </span>
-                <a href={`/blog/${post.slug}`} className="text-sm font-semibold" style={{color: '#2563eb'}}>
+                <Link href={`/blog/${post.slug}`} className="text-sm font-semibold" style={{color: '#2563eb'}}>
                   더 읽기 →
-                </a>
+                </Link>
               </div>
             </li>
           ))}

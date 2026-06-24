@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { getAllPosts } from '@/lib/posts';
 import TopicCarousel from '@/app/components/TopicCarousel';
 
@@ -21,15 +22,15 @@ export default async function Home() {
             <li key={post.slug} className="p-6 rounded-xl shadow-sm" style={{border: '1px solid #e5e7eb'}}>
               <p className="text-sm mb-1" style={{color: '#9ca3af'}}>{post.date}</p>
               <h3 className="text-xl font-semibold mb-2">
-                <a href={`/blog/${post.slug}`} style={{color: '#2563eb'}}>
+                <Link href={`/blog/${post.slug}`} style={{color: '#2563eb'}}>
                   {post.title}
-                </a>
+                </Link>
               </h3>
               <p style={{color: '#4b5563'}}>{post.description}</p>
               <div className="mt-3">
-                <a href={`/blog/${post.slug}`} className="text-sm font-semibold" style={{color: '#2563eb'}}>
+                <Link href={`/blog/${post.slug}`} className="text-sm font-semibold" style={{color: '#2563eb'}}>
                   더 읽기 →
-                </a>
+                </Link>
               </div>
             </li>
           ))}
