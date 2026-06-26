@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 const TRACKS = [
   "https://res.cloudinary.com/dkkng85jk/video/upload/v1778415637/Beneath_the_Bamboo_Canopy_whmxtb.mp3",
@@ -10,7 +10,6 @@ const TRACKS = [
 // 모듈 레벨: 같은 탭 내 페이지 이동 시 유지, 탭 닫으면 초기화
 let sharedAudio: HTMLAudioElement | null = null;
 let sharedTrackIndex = 0;
-let sharedUserStopped = false;
 
 function createAudio(): HTMLAudioElement {
   const audio = new Audio(TRACKS[sharedTrackIndex]);
@@ -25,41 +24,7 @@ function createAudio(): HTMLAudioElement {
 }
 
 export default function MusicPlayer() {
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  useEffect(() => {
-    if (sharedUserStopped) return;
-
-    if (!sharedAudio) {
-      sharedAudio = createAudio();
-    }
-    const audio = sharedAudio;
-
-    // 자동재생 시도
-    audio
-      .play()
-      .then(() => setIsPlaying(true))
-      .catch(() => {
-        // 자동재생 차단됨 — 페이지의 첫 번째 click 이벤트에서 재생 시도
-        // (버블 방식: 버튼 클릭 시에는 toggle()이 먼저 처리하고 이 리스너는 정리만 함)
-        const startOnFirstClick = () => {
-          if (sharedUserStopped || !audio.paused) {
-            document.removeEventListener("click", startOnFirstClick);
-            return;
-          }
-          audio
-            .play()
-            .then(() => {
-              setIsPlaying(true);
-              document.removeEventListener("click", startOnFirstClick);
-            })
-            .catch(() => {
-              // 이 click에서도 실패하면 다음 click에서 재시도
-            });
-        };
-        document.addEventListener("click", startOnFirstClick);
-      });
-  }, []);
+  const [isPlaying, setIsPlaying] = useState(() => Boolean(sharedAudio && !sharedAudio.paused));
 
   const toggle = () => {
     if (!sharedAudio) {
@@ -69,13 +34,11 @@ export default function MusicPlayer() {
 
     if (isPlaying) {
       audio.pause();
-      sharedUserStopped = true;
       setIsPlaying(false);
     } else {
       audio
         .play()
         .then(() => {
-          sharedUserStopped = false;
           setIsPlaying(true);
         })
         .catch(() => {});
