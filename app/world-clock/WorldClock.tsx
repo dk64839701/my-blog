@@ -12,6 +12,7 @@ type CityClock = {
 };
 
 const CLOCK_STORAGE_KEY = "world-clock-clocks";
+const TIME_FORMAT_STORAGE_KEY = "world-clock-time-format";
 
 const DEFAULT_CLOCKS: CityClock[] = [
   {
@@ -191,6 +192,11 @@ function readStoredClocks() {
   }
 }
 
+function readStoredTimeFormat() {
+  const storedTimeFormat = window.localStorage.getItem(TIME_FORMAT_STORAGE_KEY);
+  return storedTimeFormat === "12" || storedTimeFormat === "24" ? storedTimeFormat : null;
+}
+
 export default function WorldClock() {
   const [now, setNow] = useState<Date | null>(null);
   const [localTimeZone, setLocalTimeZone] = useState("로컬 시간");
@@ -203,6 +209,7 @@ export default function WorldClock() {
   useEffect(() => {
     const initialTimer = window.setTimeout(() => {
       const storedClocks = readStoredClocks();
+      const storedTimeFormat = readStoredTimeFormat();
       setLocalTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC");
       setAddableClocks(
         getSupportedTimeZones()
@@ -211,6 +218,9 @@ export default function WorldClock() {
       );
       if (storedClocks) {
         setClocks(storedClocks);
+      }
+      if (storedTimeFormat) {
+        setTimeFormat(storedTimeFormat);
       }
       setIsStorageReady(true);
       setNow(new Date());
@@ -232,6 +242,14 @@ export default function WorldClock() {
 
     window.localStorage.setItem(CLOCK_STORAGE_KEY, JSON.stringify(clocks));
   }, [clocks, isStorageReady]);
+
+  useEffect(() => {
+    if (!isStorageReady) {
+      return;
+    }
+
+    window.localStorage.setItem(TIME_FORMAT_STORAGE_KEY, timeFormat);
+  }, [isStorageReady, timeFormat]);
 
   const availableClocks = useMemo(() => {
     const selectedZones = new Set(clocks.map((clock) => clock.timeZone));
@@ -304,12 +322,12 @@ export default function WorldClock() {
         </p>
       </section>
 
-      <div className="flex flex-col gap-4 rounded-xl p-4 sm:flex-row sm:items-center sm:justify-between" style={{ border: "1px solid #e5e7eb", backgroundColor: "#ffffff" }}>
-        <div className="inline-flex w-full rounded-lg p-1 sm:w-auto" style={{ backgroundColor: "#f3f4f6" }}>
+      <div className="flex flex-col gap-4 rounded-xl p-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between" style={{ border: "1px solid #e5e7eb", backgroundColor: "#ffffff" }}>
+        <div className="inline-flex w-full rounded-lg p-1 sm:w-auto sm:min-w-56" style={{ backgroundColor: "#f3f4f6" }}>
           <button
             type="button"
             onClick={() => setTimeFormat("24")}
-            className="flex-1 rounded-md px-4 py-2 text-sm font-semibold transition-colors sm:flex-none"
+            className="flex-1 whitespace-nowrap rounded-md px-4 py-2 text-sm font-semibold transition-colors sm:flex-none"
             style={{
               backgroundColor: timeFormat === "24" ? "#2563eb" : "transparent",
               color: timeFormat === "24" ? "#ffffff" : "#4b5563",
@@ -320,7 +338,7 @@ export default function WorldClock() {
           <button
             type="button"
             onClick={() => setTimeFormat("12")}
-            className="flex-1 rounded-md px-4 py-2 text-sm font-semibold transition-colors sm:flex-none"
+            className="flex-1 whitespace-nowrap rounded-md px-4 py-2 text-sm font-semibold transition-colors sm:flex-none"
             style={{
               backgroundColor: timeFormat === "12" ? "#2563eb" : "transparent",
               color: timeFormat === "12" ? "#ffffff" : "#4b5563",
@@ -330,12 +348,12 @@ export default function WorldClock() {
           </button>
         </div>
 
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="grid w-full min-w-0 gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center lg:w-auto">
           <select
             value={activeSelectedTimeZone}
             onChange={(event) => setSelectedTimeZone(event.target.value)}
             disabled={!now || availableClocks.length === 0}
-            className="h-10 min-w-0 rounded-lg px-3 text-sm sm:w-80"
+            className="h-10 min-w-0 rounded-lg px-3 text-sm lg:w-80"
             style={{ border: "1px solid #d1d5db", color: "#374151", backgroundColor: "#ffffff" }}
           >
             {!now ? (
