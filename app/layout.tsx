@@ -42,12 +42,13 @@ export default function RootLayout({
         <header className="border-b border-gray-200 shadow-sm">
           <nav className="max-w-2xl mx-auto px-4 py-4 flex justify-between items-center">
             <Link href="/" className="text-xl font-bold" style={{color: '#2563eb'}}>
-              친사's Blog
+              친사&apos;s Blog
             </Link>
-            <div className="flex items-center gap-6">
+            <div className="flex flex-wrap items-center justify-end gap-x-6 gap-y-3">
               <MusicPlayer />
               <Link href="/" className="hover:text-blue-600 transition-colors">홈</Link>
               <Link href="/blog" className="hover:text-blue-600 transition-colors">블로그</Link>
+              <Link href="/world-clock" className="hover:text-blue-600 transition-colors">세계 시간</Link>
               <Link href="/about" className="hover:text-blue-600 transition-colors">소개</Link>
             </div>
           </nav>
@@ -58,7 +59,7 @@ export default function RootLayout({
         </main>
         <footer className="border-t border-gray-200">
           <div className="max-w-2xl mx-auto px-4 py-6 text-center text-sm" style={{color: '#9ca3af'}}>
-            © 2026 친사's Blog. All rights reserved.
+            © 2026 친사&apos;s Blog. All rights reserved.
             <span className="mx-2">·</span>
             <Link href="/admin" style={{color: '#d1d5db'}} className="hover:text-gray-400 transition-colors">
               관리자
